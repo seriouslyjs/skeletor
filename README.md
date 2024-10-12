@@ -1,12 +1,15 @@
+<div align="center">
+  <img src="./skeletor.webp" alt="Skeletor Icon" width="150" />
+</div>
+
 # Skeletor - Fast and Flexible Directory Structure Generator
 
-<div><img src="./skeletor.webp" alt="Skeletor Icon" width="150" /></div>
-
-[Skeletor](https://www.npmjs.com/package/@seriously/skeletor) is an ultra-fast, customizable CLI tool for generating directory structures and files based on YAML or JSON configuration files. Perfect for scaffolding projects, organizing file hierarchies, or automating file generation tasks.
+[Skeletor](https://www.npmjs.com/package/@seriously/skeletor) is an ultra-fast, customizable CLI tool for generating directory structures **and files with content** based on YAML configuration files. Perfect for scaffolding projects, organizing file hierarchies, or automating file generation tasks.
 
 ## Key Features
 - **Blazing Fast**: Generate thousands of files and folders in under a second.
-- **Flexible Configuration**: Supports both YAML and JSON formats for easy customization.
+- **Files with Content**: Define files with pre-written content directly in the configuration using YAML
+- **Flexible Configuration**: Supports both YAML formats for easy customization.
 - **Non-Destructive**: Keeps your existing files safe by default.
 - **Cross-Platform**: Works seamlessly on Linux, macOS, and Windows.
 
@@ -14,43 +17,40 @@
 If you're a developer or system administrator who frequently needs to set up or scaffold directory structures for new projects, Skeletor is the ideal tool. It's perfect for:
 - Rapid **project scaffolding**.
 - Organizing complex **file hierarchies**.
-- Automating **directory and file creation**.
+- Automating **directory and file creation** with **pre-defined content**.
+
 ### Installation
 
 Install Skeletor globally using npm:
 
 ```bash
 npm install -g @seriously/skeletor
-```
 
-### Usage
+Usage
 
-You can use Skeletor by running the `skeletor` command in your terminal. It automatically detects the `.skeletorrc` file in your current directory or can work with a specified input YAML file.
+You can use Skeletor by running the skeletor command in your terminal. It automatically detects the .skeletorrc file in your current directory or can work with a specified input YAML file.
 
-#### Automatic detection of `.skeletorrc`
+Automatic detection of .skeletorrc
 
-```bash
 skeletor
-```
 
-#### Using a custom YAML configuration
+Using a custom YAML configuration
 
-```bash
 skeletor --input structure.yaml
-```
 
-### Options
+Options
 
-- `--input <file>`: Path to the input YAML file describing the directory structure.
-- `--help`: Display help information for the Skeletor CLI.
+--input <file>: Path to the input YAML file describing the directory structure and file content.
 
-## Configuration File Format
+--help: Display help information for the Skeletor CLI.
 
-Skeletor uses a simple YAML format for defining directory structures. The configuration file should include a `directories` key with nested objects representing the desired folder and file structure.
 
-Here’s an example of a `structure.yaml` (or `.skeletorrc`) configuration:
+Configuration File Format
 
-```yaml
+Skeletor uses a simple YAML format for defining directory structures and file contents. The configuration file should include a directories key with nested objects representing the desired folder and file structure.
+
+Here’s an example of a structure.yaml (or .skeletorrc) configuration:
+
 directories:
   src:
     index.js: |
@@ -63,26 +63,29 @@ directories:
   README.md: |
     # Project Title
     Description of the project.
-```
 
-This example creates a `src` directory with an `index.js` file and a `components` subdirectory containing `Header.js` and `Footer.js`. It also creates a `README.md` file at the root level.
+This example creates a src directory with an index.js file and a components subdirectory containing Header.js and Footer.js, each with predefined content. It also creates a README.md file with initial content at the root level.
 
-### Non-Destructive Creation
+Non-Destructive Creation
+
 Skeletor does not overwrite existing files or directories, ensuring the integrity of your existing projects.
 
-## Why Choose Skeletor?
+Why Choose Skeletor?
 
-- **Speed**: Skeletor is designed for speed. It  can generate 1,000 files with content and 1,000 nested folders in approximately **257 ms**.
-  (when removing all the `console.log` statements!), making it the perfect tool for rapid prototyping and project scaffolding.
-- **Flexibility**: You can customise your directory structures with any content, and Skeletor adapts to your needs with ease.
-- **Efficiency**: It’s the go-to tool for developers who frequently scaffold new projects or need to organise file systems in bulk.
+Speed: Skeletor is designed for speed. It can generate 1,000 files with content and 1,000 nested folders in approximately 257 ms (after removing all the console.log statements!), making it the perfect tool for rapid prototyping and project scaffolding.
 
-## License
-Skeletor is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
+Files with Embedded Content: Pre-define file contents directly in the configuration, reducing the need for manual edits after scaffolding.
+
+Flexibility: You can customise your directory structures with any content, and Skeletor adapts to your needs with ease.
+
+Efficiency: It’s the go-to tool for developers who frequently scaffold new projects or need to organise file systems in bulk.
+
+
+License
+
+Skeletor is released under the MIT License. See the LICENSE file for more details.
+
 
 ---
 
-Start using Skeletor today to scaffold your projects with unmatched speed and simplicity. You can find the package on [npm](https://www.npmjs.com/package/@seriously/skeletor).
-```
-
-This version highlights the average speed of **500ms** for generating 1,000 files and directories, making it relevant to real-world performance based on your testing. Let me know if any other tweaks are needed!
+Start using Skeletor today to scaffold your projects with unmatched speed, flexibility, and control over file contents. You can find the package on npm.
