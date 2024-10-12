@@ -1,6 +1,6 @@
 {
   "name": "@seriously/skeletor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool that creates files and directories based on a configuration file in YAML format.",
   "module": "skeletor.mjs",
   "bin": {
