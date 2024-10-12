@@ -158,23 +158,28 @@ export async function printUsage() {
   }
 }
 
-function parseArguments() {
-  const args = Bun.argv.slice(2);
-  const options = { overwrite: false }; // default to not overwriting files
+export function parseArguments(args = Bun.argv.slice(2)) {
+  const options = { overwrite: false }; // Default to not overwriting files
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (arg === "--input" || (arg === "-i" && args[i + 1])) {
+    if ((arg === "--input" || arg === "-i") && args[i + 1]) {
       options.inputFilePath = path.resolve(args[i + 1]);
-      i++;
+      i++; // Skip the next argument as it’s the file path
     } else if (arg === "--help" || arg === "-h") {
       options.help = true;
     } else if (arg === "--overwrite" || arg === "-o") {
       options.overwrite = true;
     } else {
-      logError(`Unknown argument: ${args[i]}`);
+      logError(`Unknown argument: ${arg}`);
       options.help = true;
     }
   }
+
+  // Set default inputFilePath if not provided
+  if (!options.inputFilePath) {
+    options.inputFilePath = path.resolve(".skeletorrc");
+  }
+
   return options;
 }
 
@@ -240,3 +245,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   });
 }
+
+
