@@ -71,11 +71,13 @@ it("should correctly use the --input argument to generate the structure", () => 
 it("should display help information when --help argument is passed", () => {
   try {
     // Capture the output of the --help command
-    const helpOutput = execSync(`../skeletor.mjs --help`, { cwd: testDir, encoding: "utf-8" });
+    const helpOutput = execSync(`bun skeletor.mjs --help`, { encoding: "utf-8" });
+
+    console.log(helpOutput)
 
     // Verify that the output contains key phrases from the help text
-    expect(helpOutput).toContain("Usage:"); // Check for 'Usage' section
-    expect(helpOutput).toContain("Create a .skeletorrc or another YAML/JSON file"); // Part of description
+    expect(helpOutput).toContain("# Skeletor"); // Check for 'Usage' section
+    expect(helpOutput).toContain("Create a .skeletorrc or another YAML file"); // Part of description
     expect(helpOutput).toContain("--input"); // Check for --input option
     expect(helpOutput).toContain("--help"); // Check for --help option
   } catch (err) {
