@@ -1,0 +1,44 @@
+{
+  "name": "@seriously/skeletor",
+  "version": "0.0.3",
+  "description": "A CLI tool that creates files and directories based on a configuration file in YAML format.",
+  "module": "skeletor.mjs",
+  "bin": {
+    "skeletor": "./skeletor.mjs"
+  },
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seriouslyjs/skeletor.git"
+  },
+  "scripts": {
+    "test": "bun test",         
+    "prepare": "bun link"
+  },
+  "dependencies": {
+    "marked": "^4.1.0",
+    "marked-terminal": "^7.1.0",
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@faker-js/faker": "^9.0.3"
+  },
+  "keywords": [
+    "cli",
+    "directory",
+    "files",
+    "skeletor",
+    "templates",
+    "structure",
+    "scaffolding",
+    "scaffold",
+    "yaml",
+    "rc"
+  ],
+  "bugs": {
+    "url": "https://github.com/seriouslyjs/skeletor/issues"
+  },
+  "homepage": "https://github.com/seriouslyjs/skeletor"
+}

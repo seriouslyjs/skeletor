@@ -1,0 +1,436 @@
+directories:
+  src:
+    main:
+      java:
+        com:
+          example:
+            app:
+              controllers:
+                UserController.java: |
+                  package com.example.app.controllers;
+                  public class UserController {
+                      // Controller logic
+                  }
+                ProductController.java: |
+                  package com.example.app.controllers;
+                  public class ProductController {
+                      // Controller logic
+                  }
+              models:
+                User.java: |
+                  package com.example.app.models;
+                  public class User {
+                      private String name;
+                      private String email;
+                      // Getters and setters
+                  }
+                Product.java: |
+                  package com.example.app.models;
+                  public class Product {
+                      private String name;
+                      private double price;
+                      // Getters and setters
+                  }
+              services:
+                UserService.java: |
+                  package com.example.app.services;
+                  public class UserService {
+                      // Service logic
+                  }
+                ProductService.java: |
+                  package com.example.app.services;
+                  public class ProductService {
+                      // Service logic
+                  }
+              utils:
+                StringUtils.java: |
+                  package com.example.app.utils;
+                  public class StringUtils {
+                      // Utility methods
+                  }
+            resources:
+              messages:
+                en_US.properties: |
+                  welcome.message=Welcome
+                  goodbye.message=Goodbye
+                fr_FR.properties: |
+                  welcome.message=Bienvenue
+                  goodbye.message=Au revoir
+      resources:
+        application.properties: |
+          app.name=ComplexApp
+          app.version=2.0.0
+        log4j2.xml: |
+          <Configuration status="WARN">
+              <Appenders>
+                  <Console name="Console" target="SYSTEM_OUT">
+                      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+                  </Console>
+              </Appenders>
+              <Loggers>
+                  <Root level="info">
+                      <AppenderRef ref="Console"/>
+                  </Root>
+              </Loggers>
+          </Configuration>
+      webapp:
+        WEB-INF:
+          web.xml: |
+            <web-app>
+                <display-name>ComplexApp</display-name>
+                <servlet>
+                    <servlet-name>MainServlet</servlet-name>
+                    <servlet-class>com.example.app.MainServlet</servlet-class>
+                </servlet>
+            </web-app>
+  config:
+    dev:
+      application-dev.properties: |
+        db.url=jdbc:mysql://localhost/devdb
+        db.username=devuser
+        db.password=devpass
+    prod:
+      application-prod.properties: |
+        db.url=jdbc:mysql://prod-db/proddb
+        db.username=produser
+        db.password=prodpass
+  scripts:
+    build:
+      build.sh: |
+        #!/bin/bash
+        echo "Building application..."
+    deploy:
+      deploy.sh: |
+        #!/bin/bash
+        echo "Deploying application..."
+    migrate:
+      migrate.sh: |
+        #!/bin/bash
+        echo "Running database migrations..."
+  sql:
+    migrations:
+      V1__create_users_table.sql: |
+        CREATE TABLE users (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(100),
+            email VARCHAR(100)
+        );
+      V2__create_products_table.sql: |
+        CREATE TABLE products (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(100),
+            price DECIMAL(10,2)
+        );
+    seeds:
+      seed_users.sql: |
+        INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com'), ('Bob', 'bob@example.com');
+      seed_products.sql: |
+        INSERT INTO products (name, price) VALUES ('Widget', 19.99), ('Gadget', 29.99);
+  data:
+    sample_data:
+      users.json: |
+        [
+          {"name": "Alice", "email": "alice@example.com"},
+          {"name": "Bob", "email": "bob@example.com"}
+        ]
+      products.json: |
+        [
+          {"name": "Widget", "price": 19.99},
+          {"name": "Gadget", "price": 29.99}
+        ]
+  docs:
+    api:
+      v1:
+        users:
+          get_users.md: |
+            # Get Users API
+            **GET** `/api/v1/users`
+
+            Returns a list of users.
+
+            **Response:**
+            ```json
+            [
+              {"id": 1, "name": "Alice"},
+              {"id": 2, "name": "Bob"}
+            ]
+            ```
+        products:
+          get_products.md: |
+            # Get Products API
+            **GET** `/api/v1/products`
+
+            Returns a list of products.
+
+            **Response:**
+            ```json
+            [
+              {"id": 1, "name": "Widget", "price": 19.99},
+              {"id": 2, "name": "Gadget", "price": 29.99}
+            ]
+            ```
+      v2:
+        users:
+          get_users.md: |
+            # Get Users API v2
+            **GET** `/api/v2/users`
+
+            Returns a paginated list of users.
+
+            **Parameters:**
+            - `page`: The page number.
+            - `limit`: Number of users per page.
+    design:
+      diagrams:
+        architecture.puml: |
+          @startuml
+          [Client] --> [Web Server]
+          [Web Server] --> [Application Server]
+          [Application Server] --> [Database]
+          @enduml
+      database:
+        schema.sql: |
+          -- Database schema
+          CREATE TABLE users (...);
+          CREATE TABLE products (...);
+  tests:
+    unit:
+      controllers:
+        UserControllerTest.java: |
+          package com.example.app.controllers;
+          import org.junit.Test;
+          public class UserControllerTest {
+              @Test
+              public void testGetUser() {
+                  // Test logic
+              }
+          }
+      services:
+        UserServiceTest.java: |
+          package com.example.app.services;
+          import org.junit.Test;
+          public class UserServiceTest {
+              @Test
+              public void testCreateUser() {
+                  // Test logic
+              }
+          }
+    integration:
+      DatabaseIntegrationTest.java: |
+        package com.example.app.integration;
+        import org.junit.Test;
+        public class DatabaseIntegrationTest {
+            @Test
+            public void testDatabaseConnection() {
+                // Test logic
+            }
+        }
+  tools:
+    scripts:
+      format_code.sh: |
+        #!/bin/bash
+        echo "Formatting code..."
+      run_lint.sh: |
+        #!/bin/bash
+        echo "Running linter..."
+    configs:
+      eslint.json: |
+        {
+          "env": {
+            "browser": true,
+            "node": true
+          },
+          "extends": "eslint:recommended",
+          "rules": {
+            "indent": ["error", 2],
+            "linebreak-style": ["error", "unix"],
+            "quotes": ["error", "single"],
+            "semi": ["error", "always"]
+          }
+        }
+  .github:
+    workflows:
+      ci.yml: |
+        name: Continuous Integration
+        on: [push]
+        jobs:
+          build:
+            runs-on: ubuntu-latest
+            steps:
+            - uses: actions/checkout@v2
+            - name: Build
+              run: ./gradlew build
+  .vscode:
+    settings.json: |
+      {
+        "java.home": "/usr/lib/jvm/java-8-openjdk"
+      }
+    launch.json: |
+      {
+        "configurations": [
+          {
+            "type": "java",
+            "request": "launch",
+            "name": "Debug (Launch)",
+            "mainClass": "com.example.app.Main",
+            "projectName": "ComplexApp"
+          }
+        ]
+      }
+  .idea:
+    modules.xml: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <module type="JAVA_MODULE" version="4">
+        <component name="NewModuleRootManager">
+          <!-- Module settings -->
+        </component>
+      </module>
+  assets:
+    css:
+      styles.css: |
+        /* Main styles */
+        body {
+            font-family: Arial, sans-serif;
+        }
+    js:
+      main.js: |
+        // Main JavaScript
+        console.log('Application loaded');
+    images:
+      logo.png: |
+        (binary content placeholder)
+  .dockerignore: |
+    **/*.class
+    **/*.jar
+    logs/
+    temp/
+  .gitignore: |
+    node_modules/
+    .env
+    logs/
+    temp/
+  .editorconfig: |
+    root = true
+
+    [*]
+    charset = utf-8
+    end_of_line = lf
+    indent_style = space
+    indent_size = 2
+    insert_final_newline = true
+    trim_trailing_whitespace = true
+  Dockerfile: |
+    FROM openjdk:8-jdk-alpine
+    COPY target/ComplexApp.jar ComplexApp.jar
+    ENTRYPOINT ["java", "-jar", "ComplexApp.jar"]
+  Jenkinsfile: |
+    pipeline {
+        agent any
+        stages {
+            stage('Build') {
+                steps {
+                    sh './gradlew build'
+                }
+            }
+            stage('Test') {
+                steps {
+                    sh './gradlew test'
+                }
+            }
+        }
+    }
+  pom.xml: |
+    <project>
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>com.example</groupId>
+        <artifactId>ComplexApp</artifactId>
+        <version>2.0.0</version>
+        <dependencies>
+            <!-- Dependencies -->
+        </dependencies>
+    </project>
+  build.gradle: |
+    plugins {
+        id 'java'
+    }
+    group 'com.example'
+    version '2.0.0'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        testImplementation 'junit:junit:4.12'
+    }
+  README.md: |
+    # Complex Application
+
+    This is a complex application with a deeply nested directory structure. It is designed to test the file and directory creation capabilities of the skeletor script.
+
+    ## Features
+
+    - Deeply nested directories
+    - Multiple file types
+    - Various content formats
+    - Scripts and configuration files
+
+    ## Structure Overview
+
+    ```
+    src/
+      main/
+        java/
+          com/
+            example/
+              app/
+                controllers/
+                models/
+                services/
+                utils/
+    config/
+      dev/
+      prod/
+    scripts/
+      build/
+      deploy/
+      migrate/
+    sql/
+      migrations/
+      seeds/
+    data/
+      sample_data/
+    docs/
+      api/
+        v1/
+        v2/
+      design/
+        diagrams/
+        database/
+    tests/
+      unit/
+        controllers/
+        services/
+      integration/
+    tools/
+      scripts/
+      configs/
+    .github/
+      workflows/
+    assets/
+      css/
+      js/
+      images/
+    ```
+
+    ## Usage
+
+    Run the `skeletor` script to generate the directory structure.
+
+    ```
+    skeletor
+    ```
+  LICENSE: |
+    MIT License
+  .env.example: |
+    DB_URL=jdbc:mysql://localhost/db
+    DB_USER=username
+    DB_PASSWORD=password

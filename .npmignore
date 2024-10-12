@@ -1,0 +1,19 @@
+# Ignore test fixtures and other files
+fixtures/
+tests/
+.git/
+.bun/
+.bun.lockb
+node_modules/
+skeletor.test.mjs
+generate.mjs
+.github/
+
+# Ignore unnecessary config files
+.vscode/
+.idea/
+jsconfig.json
+
+# Ignore log files and environment settings
+*.log
+.env
