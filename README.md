@@ -1,14 +1,20 @@
-# Skeletor - Ultra-Fast Directory Structure Creator
+# Skeletor - Fast and Flexible Directory Structure Generator
 
-[Skeletor](https://www.npmjs.com/package/@seriously/skeletor) is an incredibly fast CLI tool designed to create directory structures and files based on a configuration file in YAML format. Whether you're scaffolding new projects or organising file hierarchies, Skeletor completes the job in milliseconds.
+<div><img src="./skeletor.webp" alt="Skeletor Icon" width="150" /></div>
+
+[Skeletor](https://www.npmjs.com/package/@seriously/skeletor) is an ultra-fast, customizable CLI tool for generating directory structures and files based on YAML or JSON configuration files. Perfect for scaffolding projects, organizing file hierarchies, or automating file generation tasks.
 
 ## Key Features
-- **Customisable**: Define directory structures in a `.skeletorrc` or YAML file.
-- **Non-Destructive**: Existing files and directories are preserved.
-- **Simple CLI Interface**: Easy-to-use commands to automatically detect your configuration or specify input files manually.
+- **Blazing Fast**: Generate thousands of files and folders in under a second.
+- **Flexible Configuration**: Supports both YAML and JSON formats for easy customization.
+- **Non-Destructive**: Keeps your existing files safe by default.
+- **Cross-Platform**: Works seamlessly on Linux, macOS, and Windows.
 
-## Getting Started
-
+## Why Use Skeletor?
+If you're a developer or system administrator who frequently needs to set up or scaffold directory structures for new projects, Skeletor is the ideal tool. It's perfect for:
+- Rapid **project scaffolding**.
+- Organizing complex **file hierarchies**.
+- Automating **directory and file creation**.
 ### Installation
 
 Install Skeletor globally using npm:

@@ -73,8 +73,6 @@ it("should display help information when --help argument is passed", () => {
     // Capture the output of the --help command
     const helpOutput = execSync(`bun skeletor.mjs --help`, { encoding: "utf-8" });
 
-    console.log(helpOutput)
-
     // Verify that the output contains key phrases from the help text
     expect(helpOutput).toContain("# Skeletor"); // Check for 'Usage' section
     expect(helpOutput).toContain("Create a .skeletorrc or another YAML file"); // Part of description
