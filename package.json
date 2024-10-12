@@ -1,6 +1,6 @@
 {
   "name": "@seriously/skeletor",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "A CLI tool that creates files and directories based on a configuration file in YAML format.",
   "module": "skeletor.mjs",
   "bin": {
@@ -13,7 +13,7 @@
     "url": "https://github.com/seriouslyjs/skeletor.git"
   },
   "scripts": {
-    "test": "bun test",         
+    "test": "bun test",
     "prepare": "bun link"
   },
   "dependencies": {
