@@ -1,7 +1,13 @@
 import { it, expect, beforeAll, afterAll } from "bun:test";
-import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { 
+  writeFileWithDirs, 
+  traverseStructure, 
+  countTotalTasks, 
+  createFilesAndDirectories, 
+  printUsage 
+} from "./skeletor.mjs";  // Import the functions
 
 // Test directory where Skeletor will generate files and directories
 const testDir = path.join(process.cwd(), "test_skeletor");
@@ -20,65 +26,103 @@ afterAll(() => {
   }
 });
 
-it("should generate the expected directory structure from the .skeletorrc file", () => {
-  // Copy the .skeletorrc file from the fixtures folder into the test directory
-  const skeletorConfigPath = path.join(process.cwd(), "fixtures", ".skeletorrc");
-  const testConfigPath = path.join(testDir, ".skeletorrc");
-  fs.copyFileSync(skeletorConfigPath, testConfigPath);
+it("should create file with directories and respect overwrite option", (done) => {
+  const filePath = path.join(testDir, "subdir", "testfile.txt");
 
-  // Run Skeletor from within the test directory
-  execSync(`../skeletor.mjs`, { cwd: testDir });
+  // Write the file for the first time
+  writeFileWithDirs(filePath, "Initial content", false, (err) => {
+    expect(err).toBeNull();
+    expect(fs.readFileSync(filePath, "utf-8")).toBe("Initial content");
 
-  // Expected directories and files (a subset for illustration, you can add more)
+    // Try writing again without overwrite (should not change content)
+    writeFileWithDirs(filePath, "New content", false, (err) => {
+      expect(err).toBeNull();
+      expect(fs.readFileSync(filePath, "utf-8")).toBe("Initial content");
+
+      // Now, overwrite the file
+      writeFileWithDirs(filePath, "Overwritten content", true, (err) => {
+        expect(err).toBeNull();
+        expect(fs.readFileSync(filePath, "utf-8")).toBe("Overwritten content");
+        done();
+      });
+    });
+  });
+});
+
+it("should traverse directory structure correctly", () => {
+  const structure = {
+    "src": {
+      "index.js": "console.log('Hello, world!');",
+      "components": {
+        "Header.js": "// Header component"
+      }
+    }
+  };
+
+  const paths = Array.from(traverseStructure(testDir, structure));
+
+  // Expected paths (unordered)
   const expectedPaths = [
-    path.join(testDir, "src", "main", "java", "com", "example", "app", "controllers", "UserController.java"),
-    path.join(testDir, "src", "main", "java", "com", "example", "app", "models", "User.java"),
-    path.join(testDir, "config", "dev", "application-dev.properties"),
-    path.join(testDir, "scripts", "build", "build.sh"),
-    path.join(testDir, "sql", "migrations", "V1__create_users_table.sql")
+    { type: "dir", path: path.join(testDir, "src") },
+    { type: "dir", path: path.join(testDir, "src", "components") },
+    { type: "file", path: path.join(testDir, "src", "index.js"), content: "console.log('Hello, world!');" },
+    { type: "file", path: path.join(testDir, "src", "components", "Header.js"), content: "// Header component" }
   ];
 
-  // Verify each expected file and directory exists
-  expectedPaths.forEach((filePath) => {
-    expect(fs.existsSync(filePath)).toBe(true);
+  // Check that paths match expectedPaths (regardless of order)
+  expectedPaths.forEach(expected => {
+    expect(paths).toEqual(expect.arrayContaining([expected]));
   });
-
-  // Verify file content (example for one file)
-  const userControllerContent = fs.readFileSync(path.join(testDir, "src", "main", "java", "com", "example", "app", "controllers", "UserController.java"), "utf-8");
-  expect(userControllerContent).toContain("package com.example.app.controllers;");
 });
 
-it("should correctly use the --input argument to generate the structure", () => {
-  // Copy the .skeletorrc file from the fixtures folder into the test directory
-  const skeletorConfigPath = path.join(process.cwd(), "fixtures", ".skeletorrc");
-  const testInputPath = path.join(testDir, "input.yaml");
-  fs.copyFileSync(skeletorConfigPath, testInputPath);
+it("should create files and directories correctly", (done) => {
+  const structure = {
+    "src": {
+      "index.js": "console.log('Hello, world!');",
+      "components": {
+        "Header.js": "// Header component"
+      }
+    }
+  };
 
-  // Run Skeletor with the --input argument
-  execSync(`../skeletor.mjs --input input.yaml`, { cwd: testDir });
+  createFilesAndDirectories(testDir, structure, false, (err, stats) => {
+    expect(err).toBeNull();
 
-  // Expected file
-  const expectedFile = path.join(testDir, "src", "main", "java", "com", "example", "app", "controllers", "ProductController.java");
+    // Verify the directories and files were created
+    const expectedPaths = [
+      path.join(testDir, "src", "index.js"),
+      path.join(testDir, "src", "components", "Header.js")
+    ];
 
-  // Verify the file exists
-  expect(fs.existsSync(expectedFile)).toBe(true);
+    expectedPaths.forEach(filePath => {
+      expect(fs.existsSync(filePath)).toBe(true);
+    });
 
-  // Verify the content of the file
-  const productControllerContent = fs.readFileSync(expectedFile, "utf-8");
-  expect(productControllerContent).toContain("package com.example.app.controllers;");
+    // Verify file content
+    const indexJsContent = fs.readFileSync(path.join(testDir, "src", "index.js"), "utf-8");
+    const headerJsContent = fs.readFileSync(path.join(testDir, "src", "components", "Header.js"), "utf-8");
+    
+    expect(indexJsContent).toBe("console.log('Hello, world!');");
+    expect(headerJsContent).toBe("// Header component");
+    done();
+  });
 });
 
-it("should display help information when --help argument is passed", () => {
-  try {
-    // Capture the output of the --help command
-    const helpOutput = execSync(`bun skeletor.mjs --help`, { encoding: "utf-8" });
+it("should display help information when --help argument is passed", async () => {
+  // Capture the console output
+  const originalConsoleLog = console.log;
+  let consoleOutput = "";
+  console.log = (output) => consoleOutput += output;  // Mock console.log
 
-    // Verify that the output contains key phrases from the help text
-    expect(helpOutput).toContain("# Skeletor"); // Check for 'Usage' section
-    expect(helpOutput).toContain("Create a .skeletorrc or another YAML file"); // Part of description
-    expect(helpOutput).toContain("--input"); // Check for --input option
-    expect(helpOutput).toContain("--help"); // Check for --help option
-  } catch (err) {
-    throw new Error("Failed to display help information");
-  }
+  // Call the exported printUsage function directly
+  await printUsage();
+
+  // Verify that the output contains key phrases from the help text
+  expect(consoleOutput).toContain("# Skeletor");
+  expect(consoleOutput).toContain("skeletor --input structure.yaml");
+  expect(consoleOutput).toContain("--input");
+  expect(consoleOutput).toContain("--help");
+
+  // Restore the original console.log
+  console.log = originalConsoleLog;
 });

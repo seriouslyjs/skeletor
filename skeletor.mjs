@@ -2,9 +2,14 @@
 import fs from "node:fs";
 import path from "path";
 import yaml from "yaml";
+import { fileURLToPath } from 'url';
+
+// Get the filename of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
-process.stdin.resume()    
+process.stdin.resume();
 
 const resetColor = "\x1b[0m";
 const infoColor = "\x1b[36m"; // Cyan
@@ -18,14 +23,27 @@ function logError(...message) {
   console.error(`${errorColor}`, ...message, `${resetColor}`);
 }
 
-function writeFileWithDirs(fullPath, content, callback) {
+export function writeFileWithDirs(fullPath, content, overwrite, callback) {
   fs.mkdir(path.dirname(fullPath), { recursive: true }, (err) => {
     if (err) return callback(err);
-    fs.writeFile(fullPath, content, callback);
+
+    if (!overwrite) {
+      fs.access(fullPath, fs.constants.F_OK, (err) => {
+        if (!err) {
+          logInfo(`File already exists: ${fullPath}`);
+          return callback(null); // Treat as success, skip writing
+        }
+        // File does not exist, create the file
+        fs.writeFile(fullPath, content, callback);
+      });
+    } else {
+      // Overwrite the file
+      fs.writeFile(fullPath, content, callback);
+    }
   });
 }
 
-function* traverseStructure(basePath, structure) {
+export function* traverseStructure(basePath, structure) {
   const stack = [{ base: basePath, struct: structure }];
   while (stack.length > 0) {
     const { base, struct } = stack.pop();
@@ -47,7 +65,7 @@ function* traverseStructure(basePath, structure) {
   }
 }
 
-function countTotalTasks(structure) {
+export function countTotalTasks(structure) {
   let totalTasks = 0;
   const stack = [structure];
 
@@ -64,7 +82,7 @@ function countTotalTasks(structure) {
   return totalTasks;
 }
 
-function createFilesAndDirectories(basePath, structure, done) {
+export function createFilesAndDirectories(basePath, structure, overwrite, done) {
   const totalTasks = countTotalTasks(structure);
   let completedTasks = 0;
   let filesCreated = 0;
@@ -78,8 +96,9 @@ function createFilesAndDirectories(basePath, structure, done) {
     completedTasks++;
     const percentComplete = ((completedTasks / totalTasks) * 100).toFixed(2);
     console.clear();
-    // process.stdout.cursorTo(0);
-    process.stdout.write(`Progress: ${percentComplete}% (${completedTasks}/${totalTasks}) - Last created: ${itemPath}`);
+    process.stdout.write(
+      `Progress: ${percentComplete}% (${completedTasks}/${totalTasks}) - Last created: ${itemPath}`
+    );
   }
 
   function processNext() {
@@ -87,7 +106,7 @@ function createFilesAndDirectories(basePath, structure, done) {
 
     const { value: task, done: iteratorDone } = taskIterator.next();
     if (iteratorDone) {
-      process.stdout.write('\n'); // Move to the next line after completion
+      process.stdout.write("\n"); // Move to the next line after completion
       return done(null, { filesCreated, dirsCreated });
     }
 
@@ -103,7 +122,7 @@ function createFilesAndDirectories(basePath, structure, done) {
         processNext();
       });
     } else if (task.type === "file") {
-      writeFileWithDirs(task.path, task.content, (err) => {
+      writeFileWithDirs(task.path, task.content, overwrite, (err) => {
         if (err) {
           errorOccurred = true;
           logError(`Error creating file: ${task.path}`, err.message);
@@ -119,25 +138,19 @@ function createFilesAndDirectories(basePath, structure, done) {
   processNext();
 }
 
-
-async function printUsage() {
+export async function printUsage() {
   try {
-    const { fileURLToPath } = await import('node:url');
-    // Get the directory of the current script using import.meta.url
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-
     // Resolve the path to skeletor-help.md relative to this script's directory
-    const usageFilePath = path.join(__dirname, 'skeletor-help.md');
-    
+    const usageFilePath = path.join(__dirname, "skeletor-help.md");
+
     const usageText = fs.readFileSync(usageFilePath, "utf-8");
     // Dynamically import 'marked' and 'marked-terminal'
-    const { marked } = await import('marked');
-    const { markedTerminal } = await import('marked-terminal');
-    
+    const { marked } = await import("marked");
+    const { markedTerminal } = await import("marked-terminal");
+
     // Configure marked to use marked-terminal
     marked.use(markedTerminal());
-    
+
     // Parse and display the usage text
     console.log(marked.parse(usageText));
   } catch (err) {
@@ -147,13 +160,16 @@ async function printUsage() {
 
 function parseArguments() {
   const args = Bun.argv.slice(2);
-  const options = {};
+  const options = { overwrite: false }; // default to not overwriting files
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === "--input" && args[i + 1]) {
+    const arg = args[i];
+    if (arg === "--input" || (arg === "-i" && args[i + 1])) {
       options.inputFilePath = path.resolve(args[i + 1]);
       i++;
-    } else if (args[i] === "--help") {
+    } else if (arg === "--help" || arg === "-h") {
       options.help = true;
+    } else if (arg === "--overwrite" || arg === "-o") {
+      options.overwrite = true;
     } else {
       logError(`Unknown argument: ${args[i]}`);
       options.help = true;
@@ -162,46 +178,65 @@ function parseArguments() {
   return options;
 }
 
-const options = parseArguments();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const options = parseArguments();
 
-if (options.help) {
-  printUsage().then(() => process.exit(0))
-}
+  if (options.help) {
+    printUsage().then(() => process.exit(0));
+  }
 
-const inputFilePath = options.inputFilePath || path.resolve(".skeletorrc");
+  const inputFilePath = options.inputFilePath || path.resolve(".skeletorrc");
 
-logInfo(`Reading input file: ${inputFilePath}...`);
+  logInfo(`Reading input file: ${inputFilePath}...`);
 
-fs.readFile(inputFilePath, "utf8", (err, data) => {
-  if (err) {
-    logError(`\nError reading input file: ${inputFilePath}: `, err.message, "\n\n---\n");
-    return printUsage().then(() => process.exit(1));
-    
-  } else {
-    logInfo("Input file read successfully.");
-    let config;
-    try {
-      config = yaml.parse(data);
-      logInfo(`Parsed configuration from ${inputFilePath}.`);
-      if (!config || !config.directories) {
-        logError("\nInvalid configuration: 'directories' key is required.", "\n\n---\n");
+  fs.readFile(inputFilePath, "utf8", (err, data) => {
+    if (err) {
+      logError(
+        `\nError reading input file: ${inputFilePath}: `,
+        err.message,
+        "\n\n---\n"
+      );
+      return printUsage().then(() => process.exit(1));
+    } else {
+      logInfo("Input file read successfully.");
+      let config;
+      try {
+        config = yaml.parse(data);
+        logInfo(`Parsed configuration from ${inputFilePath}.`);
+        if (!config || !config.directories) {
+          logError(
+            "\nInvalid configuration: 'directories' key is required.",
+            "\n\n---\n"
+          );
+          return printUsage().then(() => process.exit(1));
+        }
+        const startTime = Date.now();
+        createFilesAndDirectories(
+          ".",
+          config.directories,
+          options.overwrite,
+          (err, stats) => {
+            if (err) {
+              logError(
+                "\nError in creating files and directories:",
+                err.message,
+                "\n\n---\n"
+              );
+              process.exit(1);
+            } else {
+              const endTime = Date.now();
+              const timeTaken = endTime - startTime;
+              logInfo(
+                `\nSuccessfully generated ${stats.filesCreated} files and ${stats.dirsCreated} folders in ${timeTaken} ms.`
+              );
+              process.exit(0);
+            }
+          }
+        );
+      } catch (error) {
+        logError("\nError parsing YAML data:", error.message, "\n\n---\n");
         return printUsage().then(() => process.exit(1));
       }
-      const startTime = Date.now();
-      createFilesAndDirectories(".", config.directories, (err, stats) => {
-        if (err) {
-          logError("\nError in creating files and directories:", err.message, "\n\n---\n");
-          process.exit(1);
-        } else {
-          const endTime = Date.now();
-          const timeTaken = endTime - startTime;
-          logInfo(`\nSuccessfully generated ${stats.filesCreated} files and ${stats.dirsCreated} folders in ${timeTaken} ms.`);
-          process.exit(0);
-        }
-      });
-    } catch (error) {
-      logError("\nError parsing YAML data:", error.message, "\n\n---\n");
-      return printUsage().then(() => process.exit(1));
     }
-  }
-});
+  });
+}

@@ -10,8 +10,9 @@ skeletor --input structure.yaml # Create directory structure from `structure.yam
 ```
 
 **Options:**
-- `--input <file>`: Path to the input YAML file describing the directory structure.
-- `--help`: Display this help message.
+- `-i [--input] <file>`: Path to the input YAML file describing the directory structure.
+- `-h [--help]`: Display this help message.
+- `-o [--overwrite]`: Overwrite existing files if they already exist.
 
 
 **Configuration File Format:**
